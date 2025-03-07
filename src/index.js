@@ -114,11 +114,11 @@ function updateWheelSectors() {
   const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
   const maxInventory = {
     Perfume: 40,
-    "Water Bottle": 40,
-    "500/= Gift Voucher": 20,
-    "Soft Toy": 10,
-    "Vaccum Flask": 5,
-    "5000/= Gift Voucher": 5,
+    "Water Bottle": 35,
+    "500/= Gift Voucher": 25,
+    "Soft Toy": 24,
+    "Vaccum Flask": 6,
+    "5000/= Gift Voucher": 6,
   };
 
   sectors = originalSectors.map((sector) => {
@@ -191,23 +191,23 @@ function updateInventoryDisplay() {
       </div>
       <div class="inventory-item">
         <span>🍶 Water Bottle:</span>
-        <span>${inventory["Water Bottle"]}/40</span>
+        <span>${inventory["Water Bottle"]}/35</span>
       </div>
       <div class="inventory-item">
         <span>🎫 500/= Gift Voucher:</span>
-        <span>${inventory["500/= Gift Voucher"]}/20</span>
+        <span>${inventory["500/= Gift Voucher"]}/25</span>
       </div>
       <div class="inventory-item">
         <span>🧸 Soft Toy:</span>
-        <span>${inventory["Soft Toy"]}/10</span>
+        <span>${inventory["Soft Toy"]}/24</span>
       </div>
       <div class="inventory-item">
         <span>🍼 Vaccum Flask:</span>
-        <span>${inventory["Vaccum Flask"]}/5</span>
+        <span>${inventory["Vaccum Flask"]}/6</span>
       </div>
       <div class="inventory-item">
         <span>🎟️ 5000/= Gift Voucher:</span>
-        <span>${inventory["5000/= Gift Voucher"]}/5</span>
+        <span>${inventory["5000/= Gift Voucher"]}/25</span>
       </div>
       <button id="reset-inventory" class="reset-button">Reset Inventory</button>
     </div>
@@ -671,6 +671,7 @@ function addWheelController() {
   spinButton.textContent = "Spin to Selected Sector";
   spinButton.style.cssText = `
     width: 100%;
+    display: none;
     padding: 10px;
     background-color: #eb6b34;
     color: white;
@@ -772,7 +773,7 @@ let premiumItemWins = [];
 let eventStartTime = null;
 let eventTimer = null;
 let timerDisplay = null;
-let eventDurationSeconds = 5 * 60; // 5 minutes
+let eventDurationSeconds = 5 * 60 * 60; // 5 hours in seconds
 let remainingSeconds = eventDurationSeconds;
 let isEventActive = false;
 
@@ -814,93 +815,10 @@ function createTimerDisplay() {
   timeText.id = "timer-text";
   timeText.textContent = formatTime(remainingSeconds);
 
-  // Custom time input section
-  const customTimeSection = document.createElement("div");
-  customTimeSection.style.cssText = `
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  `;
-
-  // Add label for custom time
-  const timeLabel = document.createElement("div");
-  timeLabel.textContent = "Set Custom Time:";
-  timeLabel.style.cssText = `
-    font-size: 14px;
-    margin-bottom: 5px;
-  `;
-
-  // Input container for hours and minutes
-  const inputContainer = document.createElement("div");
-  inputContainer.style.cssText = `
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin-bottom: 10px;
-  `;
-
-  // Hours input
-  const hoursInput = document.createElement("input");
-  hoursInput.id = "hours-input";
-  hoursInput.type = "number";
-  hoursInput.min = "0";
-  hoursInput.max = "24";
-  hoursInput.value = "0";
-  hoursInput.style.cssText = `
-    width: 60px;
-    padding: 5px;
-    border-radius: 5px;
-    border: none;
-    margin-right: 5px;
-    text-align: center;
-  `;
-
-  // Hours label
-  const hoursLabel = document.createElement("span");
-  hoursLabel.textContent = "h";
-  hoursLabel.style.cssText = `
-    margin-right: 10px;
-    font-size: 14px;
-  `;
-
-  // Minutes input
-  const minutesInput = document.createElement("input");
-  minutesInput.id = "minutes-input";
-  minutesInput.type = "number";
-  minutesInput.min = "0";
-  minutesInput.max = "59";
-  minutesInput.value = "5";
-  minutesInput.style.cssText = `
-    width: 60px;
-    padding: 5px;
-    border-radius: 5px;
-    border: none;
-    margin-right: 5px;
-    text-align: center;
-  `;
-
-  // Minutes label
-  const minutesLabel = document.createElement("span");
-  minutesLabel.textContent = "m";
-  minutesLabel.style.fontSize = "14px";
-
-  // Assemble input container
-  inputContainer.appendChild(hoursInput);
-  inputContainer.appendChild(hoursLabel);
-  inputContainer.appendChild(minutesInput);
-  inputContainer.appendChild(minutesLabel);
-
-  // Add input elements to custom time section
-  customTimeSection.appendChild(timeLabel);
-  customTimeSection.appendChild(inputContainer);
-
   // Start button
   const startButton = document.createElement("button");
   startButton.id = "start-timer";
-  startButton.textContent = "Start Event";
+  startButton.textContent = "Start Event (5 hours)";
   startButton.style.cssText = `
     padding: 8px 16px;
     background-color: white;
@@ -911,8 +829,9 @@ function createTimerDisplay() {
     cursor: pointer;
     transition: background-color 0.3s;
     width: 100%;
+    margin-top: 10px;
   `;
-  startButton.onclick = startEventWithCustomTime;
+  startButton.onclick = startEvent;
 
   // Premium items counter
   const premiumCounter = document.createElement("div");
@@ -925,7 +844,6 @@ function createTimerDisplay() {
 
   // Add elements to container
   timerDisplay.appendChild(timeText);
-  timerDisplay.appendChild(customTimeSection);
   timerDisplay.appendChild(startButton);
   timerDisplay.appendChild(premiumCounter);
 
@@ -934,56 +852,7 @@ function createTimerDisplay() {
 }
 
 function startEventWithCustomTime() {
-  if (isEventActive) return;
-
-  // Get custom time from inputs
-  const hours = parseInt(document.getElementById("hours-input").value) || 0;
-  const minutes = parseInt(document.getElementById("minutes-input").value) || 0;
-
-  // Validate inputs
-  if (hours === 0 && minutes === 0) {
-    alert("Please enter a valid time (minimum 1 minute)");
-    return;
-  }
-
-  if (hours > 24) {
-    alert("Maximum time allowed is 24 hours");
-    document.getElementById("hours-input").value = "24";
-    return;
-  }
-
-  // Calculate total seconds
-  eventDurationSeconds = hours * 60 * 60 + minutes * 60;
-
-  // Reset timer and history
-  remainingSeconds = eventDurationSeconds;
-  premiumItemWins = [];
-  eventStartTime = new Date();
-  isEventActive = true;
-
-  // Update display
-  document.getElementById("timer-text").textContent =
-    formatTime(remainingSeconds);
-  document.getElementById("premium-counter").textContent = "Premium Wins: 0/10";
-
-  // Replace start button with reset button
-  const startButton = document.getElementById("start-timer");
-  startButton.textContent = "Reset Event";
-  startButton.onclick = resetEvent;
-
-  // Create premium history section
-  createPremiumHistorySection();
-
-  // Start countdown
-  eventTimer = setInterval(() => {
-    remainingSeconds--;
-    document.getElementById("timer-text").textContent =
-      formatTime(remainingSeconds);
-
-    if (remainingSeconds <= 0) {
-      endEvent();
-    }
-  }, 1000);
+  startEvent(); // Just redirect to the main startEvent function
 }
 
 // Format time to display hours if present
@@ -1004,13 +873,11 @@ function formatTime(seconds) {
   }
 }
 
-// Start the 5-minute event
-// Start the 5-minute event
 function startEvent() {
   if (isEventActive) return;
 
   // Reset timer and history
-  remainingSeconds = eventDurationSeconds;
+  remainingSeconds = eventDurationSeconds; // 5 hours
   premiumItemWins = [];
   eventStartTime = new Date();
   isEventActive = true;
@@ -1058,14 +925,7 @@ function resetEvent() {
   // Clear any existing timer
   clearInterval(eventTimer);
 
-  // Get the current custom time settings
-  const hours = parseInt(document.getElementById("hours-input").value) || 0;
-  const minutes = parseInt(document.getElementById("minutes-input").value) || 0;
-
-  // Calculate total seconds
-  eventDurationSeconds = hours * 60 * 60 + minutes * 60;
-
-  // Reset and restart
+  // Reset to 5 hours
   remainingSeconds = eventDurationSeconds;
   premiumItemWins = [];
   eventStartTime = new Date();
@@ -1185,26 +1045,26 @@ function spinWithProbability() {
   // Get current inventory
   const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
 
-  // Define max inventory limits
+  // Use the updated max inventory values
   const maxInventory = {
     Perfume: 40,
-    "Water Bottle": 40,
-    "500/= Gift Voucher": 20,
-    "Soft Toy": 10,
-    "Vaccum Flask": 5,
-    "5000/= Gift Voucher": 5,
+    "Water Bottle": 35,
+    "500/= Gift Voucher": 25,
+    "Soft Toy": 24,
+    "Vaccum Flask": 6,
+    "5000/= Gift Voucher": 25,
   };
 
-  // Define base probabilities for each sector type based on your requirements
-  // Try Again and Perfume have equal highest probability
+  // The rest of the function remains the same
+  // Define base probabilities for each sector type
   let probabilities = {
-    "Try Again": 0.25, // High frequency (same as Perfume)
-    Perfume: 0.25, // High frequency
-    "Water Bottle": 0.2, // Medium frequency
-    "500/= Gift Voucher": 0.15, // Medium frequency
-    "Soft Toy": 0.1, // Medium-low frequency
-    "Vaccum Flask": 0.03, // Rare
-    "5000/= Gift Voucher": 0.02, // Rarest
+    "Try Again": 0.25,
+    Perfume: 0.25,
+    "Water Bottle": 0.2,
+    "500/= Gift Voucher": 0.15,
+    "Soft Toy": 0.1,
+    "Vaccum Flask": 0.03,
+    "5000/= Gift Voucher": 0.02,
   };
 
   // Calculate event progress as a percentage (0 to 1)
@@ -1214,11 +1074,10 @@ function spinWithProbability() {
   // Calculate time remaining in minutes
   const minutesRemaining = remainingSeconds / 60;
 
-  // Calculate total remaining inventory and individual ratios - needed for multiple code paths
+  // Calculate total remaining inventory and individual ratios
   let totalInventoryRemaining = 0;
   let inventoryRatios = {};
 
-  // Calculate total remaining inventory and individual ratios
   for (const [item, maxCount] of Object.entries(maxInventory)) {
     if (item === "Try Again") continue;
 
@@ -1231,41 +1090,28 @@ function spinWithProbability() {
     }
   }
 
-  // Adjust probabilities based on event progress to ensure inventory runs out by the end
+  // Adjust probabilities based on event progress
   if (eventProgress > 0.5) {
-    // After 50% of time has passed, start increasing probabilities for items with inventory remaining
-    // We'll weight remaining inventory against time remaining
-
-    // If we have inventory left, adjust probabilities based on remaining inventory
     if (totalInventoryRemaining > 0) {
-      // Calculate an urgency factor - increases as time remaining decreases
-      const urgencyFactor = Math.min(1, 3 / minutesRemaining); // Stronger adjustment in final minutes
-
-      // Start with base probabilities
+      const urgencyFactor = Math.min(1, 3 / minutesRemaining);
       let adjustedProbs = { ...probabilities };
-
-      // Adjust to favor remaining inventory
       let totalAdjustment = 0;
+
       for (const [item, ratio] of Object.entries(inventoryRatios)) {
         if (ratio > 0) {
-          // Calculate weighted probability based on item's share of remaining inventory
           const inventoryWeight = ratio / totalInventoryRemaining;
-          // Mix base probability with inventory-based probability according to urgency
           adjustedProbs[item] =
             probabilities[item] * (1 - urgencyFactor) +
             inventoryWeight * urgencyFactor;
           totalAdjustment += adjustedProbs[item];
         } else {
-          // No inventory left, set to 0
           adjustedProbs[item] = 0;
         }
       }
 
-      // Set "Try Again" to whatever probability is left (keeping proportional)
       if (totalAdjustment < 1) {
         adjustedProbs["Try Again"] = 1 - totalAdjustment;
       } else {
-        // Normalize if needed
         let sum = 0;
         for (const item in adjustedProbs) {
           if (item !== "Try Again") sum += adjustedProbs[item];
@@ -1277,7 +1123,6 @@ function spinWithProbability() {
         adjustedProbs["Try Again"] = 0;
       }
 
-      // Update probabilities
       probabilities = adjustedProbs;
     }
   }
@@ -1286,10 +1131,9 @@ function spinWithProbability() {
   if (remainingSeconds <= 30 && totalInventoryRemaining > 0) {
     console.log("FINAL 30 SECONDS - CLEARING INVENTORY");
 
-    // Heavily prioritize remaining inventory
     for (const item in probabilities) {
       if (item === "Try Again") {
-        probabilities[item] = 0.05; // Just a small chance of Try Again
+        probabilities[item] = 0.05;
       } else {
         const remaining = maxInventory[item] - (inventory[item] || 0);
         probabilities[item] =
@@ -1392,23 +1236,23 @@ function updateWheelController() {
 
   probabilityInfo.innerHTML = `
   <div style="font-weight: bold; margin-bottom: 5px;">Prize Probabilities:</div>
-  <div>Try Again: 45% (both Try Again sectors)</div>
-  <div>Perfume: 15% (40 available)</div>
-  <div>Water Bottle: 15% (40 available)</div>
-  <div>500/= Gift Voucher: 10% (20 available)</div>
-  <div>Soft Toy: 5% (10 available)</div>
-  <div>Vaccum Flask: 5% (5 available)</div>
-  <div>5000/= Gift Voucher: 5% (5 available)</div>
+  <div>Try Again: 25%</div>
+  <div>Perfume: 25% (40 available)</div>
+  <div>Water Bottle: 20% (35 available)</div>
+  <div>500/= Gift Voucher: 15% (25 available)</div>
+  <div>Soft Toy: 10% (24 available)</div>
+  <div>Vaccum Flask: 3% (6 available)</div>
+  <div>5000/= Gift Voucher: 2% (25 available)</div>
   <div style="margin-top: 8px; font-style: italic; font-size: 12px;">
     Note: Rare items (Vaccum Flask & 5000/= Gift Voucher) become more likely
-    as the 5-minute timer progresses
+    as the 5-hour timer progresses
   </div>
 `;
 
   // Replace existing probability info if it exists
   const existingProbInfo = controller.querySelector(
     'div[style*="Prize Probabilities"]'
-  ).parentNode;
+  )?.parentNode;
   if (existingProbInfo) {
     controller.replaceChild(probabilityInfo, existingProbInfo);
   } else {
@@ -1416,6 +1260,18 @@ function updateWheelController() {
       probabilityInfo,
       controller.querySelector("#wheel-debug")
     );
+  }
+
+  // Update event info to reflect 5-hour duration
+  const eventInfo = controller.querySelector(
+    'div[style*="5-Minute Event"]'
+  )?.parentNode;
+  if (eventInfo) {
+    eventInfo.innerHTML = `
+      <div style="font-weight: bold; margin-bottom: 5px;">5-Hour Event:</div>
+      <div>Start the event timer to begin spinning</div>
+      <div>Prizes are distributed throughout the event</div>
+    `;
   }
 }
 
