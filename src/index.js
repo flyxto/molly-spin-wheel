@@ -786,6 +786,80 @@ function formatTime(seconds) {
     .padStart(2, "0")}`;
 }
 
+function addTimerToggleButton() {
+  // Create the toggle button
+  const toggleButton = document.createElement("button");
+  toggleButton.id = "timer-toggle-btn";
+  toggleButton.textContent = "Hide Timer";
+  toggleButton.style.cssText = `
+    position: fixed;
+    opacity: 40%;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(235, 107, 52, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Lato', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: background-color 0.3s;
+  `;
+
+  // Get reference to the timer display element
+  const timerDisplay = document.getElementById("event-timer");
+
+  // Add hover effect
+  toggleButton.onmouseover = () => {
+    toggleButton.style.backgroundColor = "rgba(215, 87, 32, 0.9)";
+  };
+  toggleButton.onmouseout = () => {
+    toggleButton.style.backgroundColor = "rgba(235, 107, 52, 0.9)";
+  };
+
+  // Add click event to toggle timer visibility
+  toggleButton.onclick = () => {
+    if (timerDisplay) {
+      if (timerDisplay.style.display === "none") {
+        // Show the timer
+        timerDisplay.style.display = "flex";
+        toggleButton.textContent = "Hide Timer";
+        // Store the state in localStorage
+        localStorage.setItem("timerVisible", "true");
+      } else {
+        // Hide the timer
+        timerDisplay.style.display = "none";
+        toggleButton.textContent = "Show Timer";
+        // Store the state in localStorage
+        localStorage.setItem("timerVisible", "false");
+      }
+    }
+  };
+
+  // Add to the document
+  document.body.appendChild(toggleButton);
+
+  // Check if there's a saved state in localStorage and apply it
+  const savedState = localStorage.getItem("timerVisible");
+  if (savedState === "false" && timerDisplay) {
+    timerDisplay.style.display = "none";
+    toggleButton.textContent = "Show Timer";
+  }
+}
+
+// Initialize the timer toggle button when the document is loaded
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    // Wait a short time to ensure the timer display has been created
+    setTimeout(addTimerToggleButton, 200);
+  });
+} else {
+  // If the document is already loaded, add the toggle button with a slight delay
+  setTimeout(addTimerToggleButton, 200);
+}
 // Create and add timer display
 function createTimerDisplay() {
   // Create timer container
@@ -793,7 +867,7 @@ function createTimerDisplay() {
   timerDisplay.id = "event-timer";
   timerDisplay.style.cssText = `
     position: fixed;
-    bottom: 20px;
+    bottom: 60px;
     right: 20px;
     background-color: rgba(235, 107, 52, 0.9);
     color: white;
@@ -840,7 +914,7 @@ function createTimerDisplay() {
     margin-top: 10px;
     font-size: 14px;
   `;
-  premiumCounter.textContent = "Premium Wins: 0/10";
+  premiumCounter.textContent = "Premium Wins: 0/12";
 
   // Add elements to container
   timerDisplay.appendChild(timeText);
