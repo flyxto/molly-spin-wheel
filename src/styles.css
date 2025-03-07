@@ -15,7 +15,7 @@ body {
   place-items: center;
   margin: 0;
   height: 100vh;
-  background: linear-gradient(to bottom, #ffe628, #ad7600);
+  background: linear-gradient(to bottom, #d6b274,#c79e55 );
 }
 
 #spin_the_wheel {
@@ -77,12 +77,12 @@ body {
   display: flex;
   flex-direction: column;
   /* background: linear-gradient(to left, #f1131e, #ffb822); */
-  background: linear-gradient(rgb(125, 0, 0), red);
+  background: linear-gradient(#d6b274, #c38e32);
   color: white;
   width: 400px;
   height: auto;
   padding: 20px;
-  border: solid 4px rgb(255, 29, 29);
+  border: solid 4px #a5782a;
   box-shadow: 0 0px 15px 5px rgb(255, 255, 255);
   border-radius: 16px;
   text-align: center;
@@ -120,7 +120,9 @@ body {
 #result {
   text-transform: uppercase;
   font-size: 40px;
+  margin-top: 10px;
   font-weight: bold;
+  color: black;
 }
 
 .logo {

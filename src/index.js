@@ -238,7 +238,7 @@ function resetInventory() {
 const rand = (m, M) => Math.random() * (M - m) + m;
 const tot = sectors.length;
 const spinEl = document.querySelector("#spin");
-const bodyEl = document.querySelector("#logo");
+const bodyEl = document.querySelector("#game");
 const resultsWrapperEl = document.querySelector("#results-wrapper");
 const resultEl = document.querySelector("#result");
 const resultTextEl = document.querySelector("#result-text");
@@ -369,12 +369,15 @@ updateInventoryDisplay();
 
 events.addListener("spinEnd", (sector) => {
   resultsWrapperEl.style.display = "flex";
-  resultEl.textContent = sector.label;
 
+  // Change "Try Again" to "Bad Luck" in the result text
   if (sector.label === "Try Again") {
-    resultTextEl.textContent = "Bad Luck!";
+    resultEl.textContent = "Bad Luck";
+    // Don't show the "Bad Luck!" text
+    resultTextEl.textContent = "";
     congratsTextEl.style.display = "none";
   } else {
+    resultEl.textContent = sector.label;
     resultTextEl.textContent = "You have won a";
     congratsTextEl.style.display = "block";
     updateInventory(sector.label);
@@ -773,7 +776,7 @@ let premiumItemWins = [];
 let eventStartTime = null;
 let eventTimer = null;
 let timerDisplay = null;
-let eventDurationSeconds = 5 * 60 * 60; // 5 hours in seconds
+let eventDurationSeconds = 10 * 60 * 60; // 5 hours in seconds
 let remainingSeconds = eventDurationSeconds;
 let isEventActive = false;
 
@@ -892,7 +895,7 @@ function createTimerDisplay() {
   // Start button
   const startButton = document.createElement("button");
   startButton.id = "start-timer";
-  startButton.textContent = "Start Event (5 hours)";
+  startButton.textContent = "Start Event (10   hours)";
   startButton.style.cssText = `
     padding: 8px 16px;
     background-color: white;
@@ -959,7 +962,7 @@ function startEvent() {
   // Update display
   document.getElementById("timer-text").textContent =
     formatTime(remainingSeconds);
-  document.getElementById("premium-counter").textContent = "Premium Wins: 0/10";
+  document.getElementById("premium-counter").textContent = "Premium Wins: 0/12";
 
   // Replace start button with reset button
   const startButton = document.getElementById("start-timer");
@@ -1008,7 +1011,7 @@ function resetEvent() {
   // Update display
   document.getElementById("timer-text").textContent =
     formatTime(remainingSeconds);
-  document.getElementById("premium-counter").textContent = "Premium Wins: 0/10";
+  document.getElementById("premium-counter").textContent = "Premium Wins: 0/12";
 
   // Create premium history section
   createPremiumHistorySection();
@@ -1500,7 +1503,7 @@ function trackPremiumWin(item) {
   // Update counter
   const premiumCounter = document.getElementById("premium-counter");
   if (premiumCounter) {
-    premiumCounter.textContent = `Premium Wins: ${premiumItemWins.length}/10`;
+    premiumCounter.textContent = `Premium Wins: ${premiumItemWins.length}/12`;
   }
 
   // Update history display
