@@ -334,7 +334,38 @@ function rotate() {
 function frame() {
   if (!angVel && spinButtonClicked) {
     const finalSector = sectors[getIndex()];
-    events.fire("spinEnd", finalSector);
+
+    // Check if we landed on the 5000/= Gift Voucher
+    if (finalSector.label === "5000/= Gift Voucher") {
+      console.log(
+        "WARNING: About to land on 5000/= Gift Voucher - redirecting to another sector"
+      );
+
+      // Find the next sector that's not a 5000/= Gift Voucher (just move one sector)
+      let newIndex = (getIndex() + 1) % sectors.length;
+
+      // Keep going until we find a non-5000/= Gift Voucher sector
+      while (sectors[newIndex].label === "5000/= Gift Voucher") {
+        newIndex = (newIndex + 1) % sectors.length;
+      }
+
+      // Manually set the angle to point to this new sector
+      // Calculate the angle needed to point to this sector
+      ang = TAU * (1 - newIndex / sectors.length);
+
+      // Adjust by a small amount to make it look natural
+      ang += Math.random() * 0.01 - 0.005;
+
+      // Redraw the wheel with the new angle
+      rotate();
+
+      // Fire the event with the new sector
+      events.fire("spinEnd", sectors[newIndex]);
+    } else {
+      // Normal behavior for all other sectors
+      events.fire("spinEnd", finalSector);
+    }
+
     spinButtonClicked = false;
     return;
   }
@@ -344,6 +375,96 @@ function frame() {
   ang += angVel;
   ang %= TAU;
   rotate();
+}
+
+// Also add this patch to the spinToSector function to prevent directly targeting the 5000/= Gift Voucher
+const original_spinToSector = spinToSector;
+spinToSector = function (sectorIndex, offsetDegrees = 30) {
+  // Check if the target is the 5000/= Gift Voucher
+  if (sectors[sectorIndex].label === "5000/= Gift Voucher") {
+    console.log(
+      "Attempted to spin to 5000/= Gift Voucher - redirecting to another sector"
+    );
+
+    // Find another sector (we'll just use the next one)
+    let newIndex = (sectorIndex + 1) % sectors.length;
+
+    // Keep going until we find a non-5000/= Gift Voucher sector
+    while (sectors[newIndex].label === "5000/= Gift Voucher") {
+      newIndex = (newIndex + 1) % sectors.length;
+    }
+
+    // Call the original function with the new target
+    return original_spinToSector(newIndex, offsetDegrees);
+  }
+
+  // Normal behavior for all other sectors
+  return original_spinToSector(sectorIndex, offsetDegrees);
+};
+
+// Add a monkey patch to the spinToPrize function as well
+const original_spinToPrize = spinToPrize;
+spinToPrize = function (prizeName, offsetDegrees = 30) {
+  // Check if the target is the 5000/= Gift Voucher
+  if (prizeName === "5000/= Gift Voucher") {
+    console.log(
+      "Attempted to spin to 5000/= Gift Voucher by name - redirecting"
+    );
+
+    // Choose a different prize
+    const otherPrizes = [
+      "Perfume",
+      "Water Bottle",
+      "500/= Gift Voucher",
+      "Soft Toy",
+      "Vaccum Flask",
+      "Bad Luck",
+    ];
+    const randomPrize =
+      otherPrizes[Math.floor(Math.random() * otherPrizes.length)];
+
+    // Call the original function with the new target
+    return original_spinToPrize(randomPrize, offsetDegrees);
+  }
+
+  // Normal behavior for all other prizes
+  return original_spinToPrize(prizeName, offsetDegrees);
+};
+
+// Optional: Add a debug button that makes it super obvious the prevention is working
+function addDebugButton() {
+  const debugBtn = document.createElement("button");
+  debugBtn.textContent = "Test 5000/= Prevention";
+  debugBtn.style.cssText = `
+    position: fixed;
+    bottom: 120px;
+    left: 20px;
+    background-color: #ff3366;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Lato', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+  `;
+
+  debugBtn.onclick = () => {
+    // Find the 5000/= Gift Voucher sector
+    const voucherIndex = sectors.findIndex(
+      (s) => s.label === "5000/= Gift Voucher"
+    );
+
+    if (voucherIndex !== -1) {
+      console.log("TEST: Attempting to force spin to 5000/= Gift Voucher");
+      spinToSector(voucherIndex, 30);
+    } else {
+      console.log("TEST: 5000/= Gift Voucher sector not found");
+    }
+  };
+
+  document.body.appendChild(debugBtn);
 }
 
 // 3. Update the main spin handler to use higher initial velocity
@@ -775,7 +896,7 @@ let premiumItemWins = [];
 let eventStartTime = null;
 let eventTimer = null;
 let timerDisplay = null;
-let eventDurationSeconds = 0.05 * 60 * 60; // 12 hours in seconds
+let eventDurationSeconds = 5 * 60 * 60; // 12 hours in seconds
 let remainingSeconds = eventDurationSeconds;
 let isEventActive = false;
 
@@ -953,7 +1074,7 @@ function startEvent() {
   if (isEventActive) return;
 
   // Reset timer and history
-  remainingSeconds = eventDurationSeconds; // 5 hours
+  remainingSeconds = eventDurationSeconds;
   premiumItemWins = [];
   eventStartTime = new Date();
   isEventActive = true;
@@ -971,16 +1092,11 @@ function startEvent() {
   // Create premium history section
   createPremiumHistorySection();
 
-  // Start countdown
-  eventTimer = setInterval(() => {
-    remainingSeconds--;
-    document.getElementById("timer-text").textContent =
-      formatTime(remainingSeconds);
+  // Start the timer
+  startEventTimer();
 
-    if (remainingSeconds <= 0) {
-      endEvent();
-    }
-  }, 1000);
+  // Save initial state
+  saveTimerState();
 }
 
 // End the event
@@ -995,13 +1111,16 @@ function endEvent() {
 
   // Update display
   document.getElementById("timer-text").textContent = "Time's Up!";
+
+  // Clear saved timer state
+  localStorage.removeItem("wheelTimerState");
 }
 // Reset the event
 function resetEvent() {
   // Clear any existing timer
   clearInterval(eventTimer);
 
-  // Reset to 5 hours
+  // Reset to configured duration
   remainingSeconds = eventDurationSeconds;
   premiumItemWins = [];
   eventStartTime = new Date();
@@ -1015,18 +1134,12 @@ function resetEvent() {
   // Create premium history section
   createPremiumHistorySection();
 
-  // Start countdown
-  eventTimer = setInterval(() => {
-    remainingSeconds--;
-    document.getElementById("timer-text").textContent =
-      formatTime(remainingSeconds);
+  // Start the timer
+  startEventTimer();
 
-    if (remainingSeconds <= 0) {
-      endEvent();
-    }
-  }, 1000);
+  // Save reset state
+  saveTimerState();
 }
-
 // Create tshirt history section
 function createPremiumHistorySection() {
   // Remove existing history if present
@@ -1655,9 +1768,8 @@ document.addEventListener(
   { passive: false }
 );
 
-
 function updateClickHandler() {
-  bodyEl.onclick = function() {
+  bodyEl.onclick = function () {
     if (!angVel) {
       // Original: angVel = rand(0.6, 0.8);
       // spinWithProbability();
@@ -1672,4 +1784,139 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", updateClickHandler);
 } else {
   updateClickHandler();
+}
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Timer persistence functions
+function saveTimerState() {
+  if (isEventActive) {
+    const timerState = {
+      remainingSeconds: remainingSeconds,
+      eventStartTime: eventStartTime.toISOString(),
+      premiumItemWins: premiumItemWins,
+      isEventActive: isEventActive,
+      eventDurationSeconds: eventDurationSeconds,
+    };
+    localStorage.setItem("wheelTimerState", JSON.stringify(timerState));
+    console.log("Timer state saved to localStorage:", timerState);
+  } else {
+    // Clear the saved timer state if event is not active
+    localStorage.removeItem("wheelTimerState");
+  }
+}
+
+function loadTimerState() {
+  const savedState = localStorage.getItem("wheelTimerState");
+
+  if (savedState) {
+    try {
+      const state = JSON.parse(savedState);
+      remainingSeconds = state.remainingSeconds;
+      eventStartTime = new Date(state.eventStartTime);
+      premiumItemWins = state.premiumItemWins || [];
+      isEventActive = state.isEventActive;
+      eventDurationSeconds = state.eventDurationSeconds || 0.05 * 60 * 60; // Default if not saved
+
+      console.log("Timer state loaded from localStorage:", state);
+
+      // Update UI elements
+      if (isEventActive) {
+        // Update timer display
+        const timerText = document.getElementById("timer-text");
+        if (timerText) {
+          timerText.textContent = formatTime(remainingSeconds);
+        }
+
+        // Update premium counter
+        const premiumCounter = document.getElementById("premium-counter");
+        if (premiumCounter) {
+          premiumCounter.textContent = `Premium Wins: ${premiumItemWins.length}/12`;
+        }
+
+        // Replace start button with reset button
+        const startButton = document.getElementById("start-timer");
+        if (startButton) {
+          startButton.textContent = "Reset Event";
+          startButton.onclick = resetEvent;
+        }
+
+        // Create premium history section
+        createPremiumHistorySection();
+
+        // Start the timer again
+        startEventTimer();
+
+        console.log(
+          "Timer resumed with",
+          remainingSeconds,
+          "seconds remaining"
+        );
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error loading timer state:", error);
+      return false;
+    }
+  }
+  return false;
+}
+
+function startEventTimer() {
+  // Clear any existing timer first
+  if (eventTimer) {
+    clearInterval(eventTimer);
+  }
+
+  // Start countdown
+  eventTimer = setInterval(() => {
+    remainingSeconds--;
+    document.getElementById("timer-text").textContent =
+      formatTime(remainingSeconds);
+
+    // Save state every 5 seconds
+    if (remainingSeconds % 5 === 0) {
+      saveTimerState();
+    }
+
+    if (remainingSeconds <= 0) {
+      endEvent();
+    }
+  }, 1000);
+}
+
+window.addEventListener("beforeunload", saveTimerState);
+
+// Add event listener for visibility change to handle tab switching
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "hidden") {
+    // Page is hidden (user switched tabs or minimized window)
+    saveTimerState();
+    // Pause the timer to prevent drift when tab is inactive
+    if (eventTimer) {
+      clearInterval(eventTimer);
+    }
+  } else if (document.visibilityState === "visible" && isEventActive) {
+    // Page is visible again - restart the timer if event is active
+    startEventTimer();
+  }
+});
+
+// Initialize by checking for saved state when the document is loaded
+function initializeTimerWithSavedState() {
+  // Try to load saved state
+  if (!loadTimerState()) {
+    // If no saved state, initialize the timer display normally
+    createTimerDisplay();
+  }
+
+  // Add the timer toggle button regardless
+  setTimeout(addTimerToggleButton, 200);
+}
+
+// Run when document is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeTimerWithSavedState);
+} else {
+  initializeTimerWithSavedState();
 }
