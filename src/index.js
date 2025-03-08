@@ -156,7 +156,7 @@ function initializeInventory() {
       "500/= Gift Voucher": 4,
       "Soft Toy": 5,
       "Vaccum Flask": 5,
-      "5000/= Gift Voucher": 5,
+      "5000/= Gift Voucher": 0,
     })
   );
   updateWheelSectors();
@@ -1155,7 +1155,7 @@ function spinWithProbability() {
   let inventoryRatios = {};
 
   for (const [item, maxCount] of Object.entries(maxInventory)) {
-    if (item === "Bad Luck") continue;
+    if (item === "Bad Luck" || item === "5000/= Gift Voucher") continue;
 
     const remaining = maxCount - (inventory[item] || 0);
     if (remaining > 0) {
@@ -1210,6 +1210,8 @@ function spinWithProbability() {
     for (const item in probabilities) {
       if (item === "Bad Luck") {
         probabilities[item] = 0.05;
+      } else if (item === "5000/= Gift Voucher") {
+        probabilities[item] = 0; // Always keep at 0
       } else {
         const remaining = maxInventory[item] - (inventory[item] || 0);
         probabilities[item] =
