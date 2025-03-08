@@ -156,7 +156,7 @@ function initializeInventory() {
       "500/= Gift Voucher": 4,
       "Soft Toy": 5,
       "Vaccum Flask": 5,
-      "5000/= Gift Voucher": 6,
+      "5000/= Gift Voucher": 0,
     })
   );
   updateWheelSectors();
