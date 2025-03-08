@@ -113,11 +113,11 @@ function preloadImages() {
 function updateWheelSectors() {
   const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
   const maxInventory = {
-    Perfume: 40,
-    "Water Bottle": 35,
-    "500/= Gift Voucher": 25,
-    "Soft Toy": 24,
-    "Vaccum Flask": 6,
+    Perfume: 17,
+    "Water Bottle": 24,
+    "500/= Gift Voucher": 14,
+    "Soft Toy": 8,
+    "Vaccum Flask": 2,
     "5000/= Gift Voucher": 5, // Keep this in the maxInventory
   };
 
@@ -150,11 +150,11 @@ function initializeInventory() {
   localStorage.setItem(
     "wheelInventory",
     JSON.stringify({
-      Perfume: 8,
-      "Water Bottle": 5,
-      "500/= Gift Voucher": 4,
-      "Soft Toy": 5,
-      "Vaccum Flask": 5,
+      Perfume: 0,
+      "Water Bottle": 0,
+      "500/= Gift Voucher": 0,
+      "Soft Toy": 0,
+      "Vaccum Flask": 0,
       "5000/= Gift Voucher": 0, // Initialize with 0 count
     })
   );
@@ -186,23 +186,23 @@ function updateInventoryDisplay() {
     <div class="inventory-items">
       <div class="inventory-item">
         <span>🧴 Perfume:</span>
-        <span>${inventory["Perfume"]}/40</span>
+        <span>${inventory["Perfume"]}/17</span>
       </div>
       <div class="inventory-item">
         <span>🍶 Water Bottle:</span>
-        <span>${inventory["Water Bottle"]}/35</span>
+        <span>${inventory["Water Bottle"]}/24</span>
       </div>
       <div class="inventory-item">
         <span>🎫 500/= Gift Voucher:</span>
-        <span>${inventory["500/= Gift Voucher"]}/25</span>
+        <span>${inventory["500/= Gift Voucher"]}/14</span>
       </div>
       <div class="inventory-item">
         <span>🧸 Soft Toy:</span>
-        <span>${inventory["Soft Toy"]}/24</span>
+        <span>${inventory["Soft Toy"]}/8</span>
       </div>
       <div class="inventory-item">
         <span>🍼 Vaccum Flask:</span>
-        <span>${inventory["Vaccum Flask"]}/6</span>
+        <span>${inventory["Vaccum Flask"]}/2</span>
       </div>
       <div class="inventory-item">
         <span>🎟️ 5000/= Gift Voucher:</span>
@@ -1220,11 +1220,11 @@ function updatePremiumHistory() {
 function updateWheelSectors() {
   const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
   const maxInventory = {
-    Perfume: 40,
-    "Water Bottle": 35,
-    "500/= Gift Voucher": 25,
-    "Soft Toy": 24,
-    "Vaccum Flask": 6,
+    Perfume: 17,
+    "Water Bottle": 24,
+    "500/= Gift Voucher": 14,
+    "Soft Toy": 8,
+    "Vaccum Flask": 2,
     "5000/= Gift Voucher": 5, // Keep this in the maxInventory
   };
 
@@ -1258,11 +1258,11 @@ function initializeInventory() {
   localStorage.setItem(
     "wheelInventory",
     JSON.stringify({
-      Perfume: 8,
-      "Water Bottle": 5,
-      "500/= Gift Voucher": 4,
-      "Soft Toy": 5,
-      "Vaccum Flask": 5,
+      Perfume: 0,
+      "Water Bottle": 0,
+      "500/= Gift Voucher": 0,
+      "Soft Toy": 0,
+      "Vaccum Flask": 0,
       "5000/= Gift Voucher": 0, // Initialize with 0 count
     })
   );
@@ -1290,11 +1290,11 @@ function spinWithProbability() {
 
   // Use the updated max inventory values
   const maxInventory = {
-    Perfume: 40,
-    "Water Bottle": 35,
-    "500/= Gift Voucher": 25,
-    "Soft Toy": 24,
-    "Vaccum Flask": 6,
+    Perfume: 17,
+    "Water Bottle": 24,
+    "500/= Gift Voucher": 14,
+    "Soft Toy": 8,
+    "Vaccum Flask": 2,
     "5000/= Gift Voucher": 5, // Keep this included but we'll avoid landing on it
   };
 
@@ -1603,7 +1603,7 @@ function updateWheelController() {
   <div>500/= Gift Voucher: 20% (20 available)</div>
   <div>Soft Toy: 10% (10 available)</div>
   <div>Vaccum Flask: 5% (5 available)</div>
-  <div>5000/= Gift Voucher: 5% (5 available)</div>
+  <div>5000/= Gift Voucher: 0% (5 available)</div>
   <div style="margin-top: 8px; font-style: italic; font-size: 12px;">
     Note: Rare items (Vaccum Flask & 5000/= Gift Voucher) become more likely
     as the 5-minute timer progresses
