@@ -895,7 +895,7 @@ function createTimerDisplay() {
   // Start button
   const startButton = document.createElement("button");
   startButton.id = "start-timer";
-  startButton.textContent = "Start Event (10   hours)";
+  startButton.textContent = "Start Event (12   hours)";
   startButton.style.cssText = `
     padding: 8px 16px;
     background-color: white;
