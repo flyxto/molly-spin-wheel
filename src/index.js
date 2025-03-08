@@ -1135,13 +1135,13 @@ function spinWithProbability() {
   // The rest of the function remains the same
   // Define base probabilities for each sector type
   let probabilities = {
-    "Bad Luck": 0.25,
-    Perfume: 0.25,
-    "Water Bottle": 0.2,
-    "500/= Gift Voucher": 0.15,
-    "Soft Toy": 0.1,
-    "Vaccum Flask": 0.03,
-    "5000/= Gift Voucher": 0.02,
+    "Bad Luck": 0.35, // Increased from 0.25 to 0.35
+    Perfume: 0.28, // Slightly increased from 0.25 to 0.28
+    "Water Bottle": 0.22, // Slightly increased from 0.20 to 0.22
+    "500/= Gift Voucher": 0.08, // Reduced from 0.15 to 0.08
+    "Soft Toy": 0.05, // Reduced from 0.10 to 0.05
+    "Vaccum Flask": 0.01, // Reduced from 0.03 to 0.01
+    "5000/= Gift Voucher": 0.01, // Reduced from 0.02 to 0.01
   };
 
   // Calculate event progress as a percentage (0 to 1)
@@ -1537,32 +1537,64 @@ if (document.readyState === "loading") {
 // You can also call this function from the console to perform a weighted spin:
 // spinWithProbability();
 
-// Prevent middle mouse button actions
-document.addEventListener('mousedown', function(e) {
-  // Middle mouse button is usually button 1 (button 0 is left, button 2 is right)
-  if (e.button === 1) {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Middle mouse button click prevented');
-    return false;
-  }
-}, true);
+// Prevent middle mouse button and right mouse button actions
+document.addEventListener(
+  "mousedown",
+  function (e) {
+    // Middle mouse button is usually button 1 (button 0 is left, button 2 is right)
+    if (e.button === 1 || e.button === 2) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(
+        e.button === 1
+          ? "Middle mouse button click prevented"
+          : "Right mouse button click prevented"
+      );
+      return false;
+    }
+  },
+  true
+);
 
-// Prevent mousewheel click action as well
-document.addEventListener('auxclick', function(e) {
-  if (e.button === 1) {
+// Prevent mousewheel click and right-click actions
+document.addEventListener(
+  "auxclick",
+  function (e) {
+    if (e.button === 1 || e.button === 2) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(
+        e.button === 1
+          ? "Auxiliary middle mouse click prevented"
+          : "Auxiliary right mouse click prevented"
+      );
+      return false;
+    }
+  },
+  true
+);
+
+// Prevent context menu (right-click menu)
+document.addEventListener(
+  "contextmenu",
+  function (e) {
     e.preventDefault();
-    e.stopPropagation();
-    console.log('Auxiliary middle mouse click prevented');
+    console.log("Context menu prevented");
     return false;
-  }
-}, true);
+  },
+  true
+);
 
 // Additionally prevent the default scroll behavior that might trigger unwanted actions
-document.addEventListener('wheel', function(e) {
-  if (e.buttons === 4 || e.button === 1) { // Button 4 is sometimes used for wheel press
-    e.preventDefault();
-    console.log('Middle mouse wheel scroll prevented');
-    return false;
-  }
-}, { passive: false });
+document.addEventListener(
+  "wheel",
+  function (e) {
+    if (e.buttons === 4 || e.button === 1) {
+      // Button 4 is sometimes used for wheel press
+      e.preventDefault();
+      console.log("Middle mouse wheel scroll prevented");
+      return false;
+    }
+  },
+  { passive: false }
+);
