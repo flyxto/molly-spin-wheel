@@ -162,7 +162,7 @@ function initializeInventory() {
         "500/= Gift Voucher": 0,
         "Soft Toy": 8,
         "Vaccum Flask": 0,
-        "5000/= Gift Voucher": 0,
+        "5000/= Gift Voucher": 5,
       })
     );
   } else {
@@ -243,7 +243,7 @@ function resetInventory() {
         "500/= Gift Voucher": 0,
         "Soft Toy": 8, // Keep at 8 to show full capacity
         "Vaccum Flask": 0,
-        "5000/= Gift Voucher": 0,
+        "5000/= Gift Voucher": 5,
       })
     );
     updateInventoryDisplay();
@@ -265,7 +265,7 @@ function resetInventory() {
         "500/= Gift Voucher": 0,
         "Soft Toy": 8, // Keep at 8 to show full capacity
         "Vaccum Flask": 0,
-        "5000/= Gift Voucher": 0,
+        "5000/= Gift Voucher": 5,
       })
     );
     updateInventoryDisplay();
@@ -1276,7 +1276,7 @@ function initializeInventory() {
       "500/= Gift Voucher": 0,
       "Soft Toy": 8,
       "Vaccum Flask": 0,
-      "5000/= Gift Voucher": 0, // Initialize with 0 count
+      "5000/= Gift Voucher": 5, // Initialize with 0 count
     })
   );
   updateWheelSectors();
