@@ -6,8 +6,11 @@
 
   if (isFirstLoad) {
     console.log("First page load detected, will refresh in 1 second");
-    // Mark that we've loaded the page
+    // Mark that we've loaded the page but don't initialize inventory yet
     sessionStorage.setItem("pageLoaded", "true");
+
+    // Set a temporary flag to prevent initialization during the upcoming auto-refresh
+    localStorage.setItem("skipInitInventory", "true");
 
     // Set a timeout to refresh after 1 second
     setTimeout(() => {
@@ -16,6 +19,8 @@
     }, 1000);
   } else {
     console.log("Page has been refreshed");
+    // Clear the skip flag after refresh
+    localStorage.removeItem("skipInitInventory");
   }
 })();
 
@@ -146,18 +151,23 @@ function updateWheelSectors() {
   rotate();
 }
 function initializeInventory() {
-  // Always set to the specified values, regardless of what's in localStorage
-  localStorage.setItem(
-    "wheelInventory",
-    JSON.stringify({
-      Perfume: 0,
-      "Water Bottle": 0,
-      "500/= Gift Voucher": 0,
-      "Soft Toy": 0,
-      "Vaccum Flask": 0,
-      "5000/= Gift Voucher": 0, // Initialize with 0 count
-    })
-  );
+  // Only initialize if wheelInventory doesn't exist in localStorage
+  if (!localStorage.getItem("wheelInventory")) {
+    console.log("Initializing new inventory");
+    localStorage.setItem(
+      "wheelInventory",
+      JSON.stringify({
+        Perfume: 0,
+        "Water Bottle": 0,
+        "500/= Gift Voucher": 0,
+        "Soft Toy": 8,
+        "Vaccum Flask": 0,
+        "5000/= Gift Voucher": 0,
+      })
+    );
+  } else {
+    console.log("Using existing inventory from localStorage");
+  }
   updateWheelSectors();
 }
 
@@ -186,11 +196,11 @@ function updateInventoryDisplay() {
     <div class="inventory-items">
       <div class="inventory-item">
         <span>🧴 Perfume:</span>
-        <span>${inventory["Perfume"]}/17</span>
+        <span>${inventory["Perfume"]}/15</span>
       </div>
       <div class="inventory-item">
         <span>🍶 Water Bottle:</span>
-        <span>${inventory["Water Bottle"]}/24</span>
+        <span>${inventory["Water Bottle"]}/21</span>
       </div>
       <div class="inventory-item">
         <span>🎫 500/= Gift Voucher:</span>
@@ -202,7 +212,7 @@ function updateInventoryDisplay() {
       </div>
       <div class="inventory-item">
         <span>🍼 Vaccum Flask:</span>
-        <span>${inventory["Vaccum Flask"]}/2</span>
+        <span>${inventory["Vaccum Flask"]}/1</span>
       </div>
       <div class="inventory-item">
         <span>🎟️ 5000/= Gift Voucher:</span>
@@ -484,7 +494,7 @@ function engine() {
 
 // Initialize when page loads
 preloadImages();
-initializeInventory();
+// initializeInventory();
 updateInventoryDisplay();
 
 events.addListener("spinEnd", (sector) => {
@@ -510,14 +520,22 @@ document
   .addEventListener("click", resetInventory);
 
 function init() {
+  // First draw the wheel
   sectors.forEach(drawSector);
   rotate();
   engine();
-  // bodyEl.addEventListener("click", () => {
-  //   if (!angVel) angVel = rand(0.25, 0.45);
-  //   spinButtonClicked = true;
-  //   console.log("main spin button");
-  // });
+
+  // Load inventory and update display
+  if (localStorage.getItem("skipInitInventory") !== "true") {
+    console.log("Loading inventory normally");
+    // initializeInventory();
+    updateInventoryDisplay();
+  } else {
+    console.log("Skipping inventory initialization due to auto-refresh");
+    // Just update the sectors with existing data
+    updateWheelSectors();
+    updateInventoryDisplay();
+  }
 }
 
 resultsWrapperEl.addEventListener("click", function (event) {
@@ -702,6 +720,7 @@ function addWheelController() {
   const controller = document.createElement("div");
   controller.id = "wheel-controller";
   controller.style.cssText = `
+  display: none;
     position: fixed;
     bottom: 20px;
     left: 20px;
@@ -1217,57 +1236,22 @@ function updatePremiumHistory() {
 }
 
 // Function to check inventory and update sectors
-function updateWheelSectors() {
-  const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
-  const maxInventory = {
-    Perfume: 17,
-    "Water Bottle": 24,
-    "500/= Gift Voucher": 14,
-    "Soft Toy": 8,
-    "Vaccum Flask": 2,
-    "5000/= Gift Voucher": 5, // Keep this in the maxInventory
-  };
 
-  sectors = originalSectors.map((sector) => {
-    // Skip "Bad Luck" sectors
-    if (sector.label === "Bad Luck") {
-      return sector;
-    }
-
-    // Check if this item is out of stock
-    if (inventory[sector.label] >= maxInventory[sector.label]) {
-      return {
-        ...sector,
-        label: "Bad Luck",
-        // color: "#f1131e", // Use the red color for Bad Luck
-        image:
-          "https://res.cloudinary.com/dicewvvjl/image/upload/v1736947162/pu0tlogr54tnhtjvsev7.png", // Use the Bad Luck image
-      };
-    }
-    return sector;
-  });
-
-  // Redraw the wheel with updated sectors
-  ctx.clearRect(0, 0, dia, dia);
-  sectors.forEach(drawSector);
-  rotate();
-}
-
-function initializeInventory() {
-  // Always set to the specified values, regardless of what's in localStorage
-  localStorage.setItem(
-    "wheelInventory",
-    JSON.stringify({
-      Perfume: 0,
-      "Water Bottle": 0,
-      "500/= Gift Voucher": 0,
-      "Soft Toy": 0,
-      "Vaccum Flask": 0,
-      "5000/= Gift Voucher": 0, // Initialize with 0 count
-    })
-  );
-  updateWheelSectors();
-}
+// function initializeInventory() {
+//   // Always set to the specified values, regardless of what's in localStorage
+//   localStorage.setItem(
+//     "wheelInventory",
+//     JSON.stringify({
+//       Perfume: 0,
+//       "Water Bottle": 0,
+//       "500/= Gift Voucher": 0,
+//       "Soft Toy": 0,
+//       "Vaccum Flask": 0,
+//       "5000/= Gift Voucher": 0, // Initialize with 0 count
+//     })
+//   );
+//   updateWheelSectors();
+// }
 
 // Update the spinWithProbability function to include the 5000/= Gift Voucher
 function spinWithProbability() {
@@ -1290,11 +1274,11 @@ function spinWithProbability() {
 
   // Use the updated max inventory values
   const maxInventory = {
-    Perfume: 17,
-    "Water Bottle": 24,
+    Perfume: 15,
+    "Water Bottle": 21,
     "500/= Gift Voucher": 14,
     "Soft Toy": 8,
-    "Vaccum Flask": 2,
+    "Vaccum Flask": 1,
     "5000/= Gift Voucher": 5, // Keep this included but we'll avoid landing on it
   };
 
@@ -1510,59 +1494,7 @@ function forceSpinWithout5000Voucher() {
 }
 
 // Also update the probability info display in the wheel controller
-function updateWheelController() {
-  const controller = document.getElementById("wheel-controller");
-  if (!controller) return;
 
-  // Add a new section for probability settings
-  const probabilityInfo = document.createElement("div");
-  probabilityInfo.style.marginTop = "15px";
-  probabilityInfo.style.marginBottom = "15px";
-  probabilityInfo.style.padding = "10px";
-  probabilityInfo.style.backgroundColor = "#f5f5f5";
-  probabilityInfo.style.borderRadius = "5px";
-  probabilityInfo.style.border = "1px solid #ddd";
-
-  probabilityInfo.innerHTML = `
-  <div style="font-weight: bold; margin-bottom: 5px;">Prize Probabilities:</div>
-  <div>Bad Luck: 35%</div>
-  <div>Perfume: 28% (40 available)</div>
-  <div>Water Bottle: 22% (35 available)</div>
-  <div>500/= Gift Voucher: 8% (25 available)</div>
-  <div>Soft Toy: 5% (24 available)</div>
-  <div>Vaccum Flask: 1% (6 available)</div>
-  <div>5000/= Gift Voucher: 1% (5 available)</div>
-  <div style="margin-top: 8px; font-style: italic; font-size: 12px;">
-    Note: Rare items (Vaccum Flask & 5000/= Gift Voucher) become more likely
-    as the timer progresses
-  </div>
-`;
-
-  // Replace existing probability info if it exists
-  const existingProbInfo = controller.querySelector(
-    'div[style*="Prize Probabilities"]'
-  )?.parentNode;
-  if (existingProbInfo) {
-    controller.replaceChild(probabilityInfo, existingProbInfo);
-  } else {
-    controller.insertBefore(
-      probabilityInfo,
-      controller.querySelector("#wheel-debug")
-    );
-  }
-
-  // Update event info to reflect current duration
-  const eventInfo = controller.querySelector(
-    'div[style*="5-Minute Event"]'
-  )?.parentNode;
-  if (eventInfo) {
-    eventInfo.innerHTML = `
-      <div style="font-weight: bold; margin-bottom: 5px;">Event Timer:</div>
-      <div>Start the event timer to begin spinning</div>
-      <div>Prizes are distributed throughout the event</div>
-    `;
-  }
-}
 // Update spin button click handler
 function updateSpinButtonHandler() {
   // Remove existing click handler from bodyEl
