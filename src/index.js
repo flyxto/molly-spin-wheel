@@ -118,7 +118,7 @@ function updateWheelSectors() {
     "500/= Gift Voucher": 25,
     "Soft Toy": 24,
     "Vaccum Flask": 6,
-    "5000/= Gift Voucher": 6,
+    "5000/= Gift Voucher": 10,
   };
 
   sectors = originalSectors.map((sector) => {
@@ -147,19 +147,18 @@ function updateWheelSectors() {
 }
 
 function initializeInventory() {
-  if (!localStorage.getItem("wheelInventory")) {
-    localStorage.setItem(
-      "wheelInventory",
-      JSON.stringify({
-        Perfume: 0,
-        "Water Bottle": 0,
-        "500/= Gift Voucher": 0,
-        "Soft Toy": 0,
-        "Vaccum Flask": 0,
-        "5000/= Gift Voucher": 0,
-      })
-    );
-  }
+  // Always set to the specified values, regardless of what's in localStorage
+  localStorage.setItem(
+    "wheelInventory",
+    JSON.stringify({
+      Perfume: 8,
+      "Water Bottle": 5,
+      "500/= Gift Voucher": 4,
+      "Soft Toy": 5,
+      "Vaccum Flask": 5,
+      "5000/= Gift Voucher": 10,
+    })
+  );
   updateWheelSectors();
 }
 
@@ -177,6 +176,7 @@ function updateInventory(item) {
   updateWheelSectors(); // Update wheel sectors after updating inventory
 }
 
+// Display inventory counts
 // Display inventory counts
 function updateInventoryDisplay() {
   const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
@@ -207,13 +207,12 @@ function updateInventoryDisplay() {
       </div>
       <div class="inventory-item">
         <span>🎟️ 5000/= Gift Voucher:</span>
-        <span>${inventory["5000/= Gift Voucher"]}/25</span>
+        <span>${inventory["5000/= Gift Voucher"]}/10</span>
       </div>
       <button id="reset-inventory" class="reset-button">Reset Inventory</button>
     </div>
   `;
 }
-
 function resetInventory() {
   const confirmReset = confirm(
     "Are you sure you want to reset your inventory? This action cannot be undone."
@@ -1129,7 +1128,7 @@ function spinWithProbability() {
     "500/= Gift Voucher": 25,
     "Soft Toy": 24,
     "Vaccum Flask": 6,
-    "5000/= Gift Voucher": 25,
+    "5000/= Gift Voucher": 10,
   };
 
   // The rest of the function remains the same
