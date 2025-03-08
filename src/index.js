@@ -1536,3 +1536,33 @@ if (document.readyState === "loading") {
 
 // You can also call this function from the console to perform a weighted spin:
 // spinWithProbability();
+
+// Prevent middle mouse button actions
+document.addEventListener('mousedown', function(e) {
+  // Middle mouse button is usually button 1 (button 0 is left, button 2 is right)
+  if (e.button === 1) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Middle mouse button click prevented');
+    return false;
+  }
+}, true);
+
+// Prevent mousewheel click action as well
+document.addEventListener('auxclick', function(e) {
+  if (e.button === 1) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Auxiliary middle mouse click prevented');
+    return false;
+  }
+}, true);
+
+// Additionally prevent the default scroll behavior that might trigger unwanted actions
+document.addEventListener('wheel', function(e) {
+  if (e.buttons === 4 || e.button === 1) { // Button 4 is sometimes used for wheel press
+    e.preventDefault();
+    console.log('Middle mouse wheel scroll prevented');
+    return false;
+  }
+}, { passive: false });
