@@ -118,7 +118,7 @@ function updateWheelSectors() {
     "500/= Gift Voucher": 25,
     "Soft Toy": 24,
     "Vaccum Flask": 6,
-    "5000/= Gift Voucher": 12,
+    "5000/= Gift Voucher": 5,
   };
 
   sectors = originalSectors.map((sector) => {
@@ -207,7 +207,7 @@ function updateInventoryDisplay() {
       </div>
       <div class="inventory-item">
         <span>🎟️ 5000/= Gift Voucher:</span>
-        <span>${inventory["5000/= Gift Voucher"]}/12</span>
+        <span>${inventory["5000/= Gift Voucher"]}/5</span>
       </div>
       <button id="reset-inventory" class="reset-button">Reset Inventory</button>
     </div>
@@ -1128,7 +1128,7 @@ function spinWithProbability() {
     "500/= Gift Voucher": 25,
     "Soft Toy": 24,
     "Vaccum Flask": 6,
-    "5000/= Gift Voucher": 12,
+    "5000/= Gift Voucher": 5,
   };
 
   // The rest of the function remains the same
