@@ -775,7 +775,7 @@ let premiumItemWins = [];
 let eventStartTime = null;
 let eventTimer = null;
 let timerDisplay = null;
-let eventDurationSeconds = 10 * 60 * 60; // 12 hours in seconds
+let eventDurationSeconds = .05 * 60 * 60; // 12 hours in seconds
 let remainingSeconds = eventDurationSeconds;
 let isEventActive = false;
 
@@ -1128,7 +1128,7 @@ function spinWithProbability() {
     "500/= Gift Voucher": 25,
     "Soft Toy": 24,
     "Vaccum Flask": 6,
-    "5000/= Gift Voucher": 5,
+    // "5000/= Gift Voucher": 5,
   };
 
   // The rest of the function remains the same
@@ -1140,7 +1140,7 @@ function spinWithProbability() {
     "500/= Gift Voucher": 0.08, // Reduced from 0.15 to 0.08
     "Soft Toy": 0.05, // Reduced from 0.10 to 0.05
     "Vaccum Flask": 0.01, // Reduced from 0.03 to 0.01
-    "5000/= Gift Voucher": 0, // Reduced from 0.02 to 0.01
+    // "5000/= Gift Voucher": 0, // Reduced from 0.02 to 0.01
   };
 
   // Calculate event progress as a percentage (0 to 1)
@@ -1211,7 +1211,7 @@ function spinWithProbability() {
       if (item === "Bad Luck") {
         probabilities[item] = 0.05;
       } else if (item === "5000/= Gift Voucher") {
-        probabilities[item] = 0; // Always keep at 0
+        continue;
       } else {
         const remaining = maxInventory[item] - (inventory[item] || 0);
         probabilities[item] =
