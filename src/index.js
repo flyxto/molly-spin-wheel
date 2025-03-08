@@ -156,7 +156,7 @@ function initializeInventory() {
       "500/= Gift Voucher": 4,
       "Soft Toy": 5,
       "Vaccum Flask": 5,
-      "5000/= Gift Voucher": 0,
+      "5000/= Gift Voucher": 5,
     })
   );
   updateWheelSectors();
@@ -1140,7 +1140,7 @@ function spinWithProbability() {
     "500/= Gift Voucher": 0.08, // Reduced from 0.15 to 0.08
     "Soft Toy": 0.05, // Reduced from 0.10 to 0.05
     "Vaccum Flask": 0.01, // Reduced from 0.03 to 0.01
-    "5000/= Gift Voucher": 0.01, // Reduced from 0.02 to 0.01
+    "5000/= Gift Voucher": 0, // Reduced from 0.02 to 0.01
   };
 
   // Calculate event progress as a percentage (0 to 1)
