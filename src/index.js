@@ -156,7 +156,7 @@ function initializeInventory() {
       "500/= Gift Voucher": 4,
       "Soft Toy": 5,
       "Vaccum Flask": 5,
-      "5000/= Gift Voucher": 6,
+      "5000/= Gift Voucher": 0,
     })
   );
   updateWheelSectors();
@@ -775,7 +775,7 @@ let premiumItemWins = [];
 let eventStartTime = null;
 let eventTimer = null;
 let timerDisplay = null;
-let eventDurationSeconds = 6 * 60 * 60; // 12 hours in seconds
+let eventDurationSeconds = 10 * 60 * 60; // 12 hours in seconds
 let remainingSeconds = eventDurationSeconds;
 let isEventActive = false;
 
