@@ -118,7 +118,7 @@ function preloadImages() {
 function updateWheelSectors() {
   const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
   const maxInventory = {
-    Perfume: 17,
+    Perfume: 15,
     "Water Bottle": 24,
     "500/= Gift Voucher": 14,
     "Soft Toy": 8,
