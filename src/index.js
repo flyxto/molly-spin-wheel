@@ -118,7 +118,7 @@ function updateWheelSectors() {
     "500/= Gift Voucher": 25,
     "Soft Toy": 24,
     "Vaccum Flask": 6,
-    "5000/= Gift Voucher": 5,
+    "5000/= Gift Voucher": 5, // Keep this in the maxInventory
   };
 
   sectors = originalSectors.map((sector) => {
@@ -145,7 +145,6 @@ function updateWheelSectors() {
   sectors.forEach(drawSector);
   rotate();
 }
-
 function initializeInventory() {
   // Always set to the specified values, regardless of what's in localStorage
   localStorage.setItem(
@@ -156,7 +155,7 @@ function initializeInventory() {
       "500/= Gift Voucher": 4,
       "Soft Toy": 5,
       "Vaccum Flask": 5,
-      "5000/= Gift Voucher": 0,
+      "5000/= Gift Voucher": 0, // Initialize with 0 count
     })
   );
   updateWheelSectors();
@@ -227,13 +226,14 @@ function resetInventory() {
         "500/= Gift Voucher": 0,
         "Soft Toy": 0,
         "Vaccum Flask": 0,
-        "5000/= Gift Voucher": 0,
+        "5000/= Gift Voucher": 0, // Make sure to include this in the reset
       })
     );
     updateInventoryDisplay();
     updateWheelSectors();
   }
 }
+
 const rand = (m, M) => Math.random() * (M - m) + m;
 const tot = sectors.length;
 const spinEl = document.querySelector("#spin");
@@ -775,7 +775,7 @@ let premiumItemWins = [];
 let eventStartTime = null;
 let eventTimer = null;
 let timerDisplay = null;
-let eventDurationSeconds = .05 * 60 * 60; // 12 hours in seconds
+let eventDurationSeconds = 0.05 * 60 * 60; // 12 hours in seconds
 let remainingSeconds = eventDurationSeconds;
 let isEventActive = false;
 
@@ -1103,6 +1103,60 @@ function updatePremiumHistory() {
   });
 }
 
+// Function to check inventory and update sectors
+function updateWheelSectors() {
+  const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
+  const maxInventory = {
+    Perfume: 40,
+    "Water Bottle": 35,
+    "500/= Gift Voucher": 25,
+    "Soft Toy": 24,
+    "Vaccum Flask": 6,
+    "5000/= Gift Voucher": 5, // Keep this in the maxInventory
+  };
+
+  sectors = originalSectors.map((sector) => {
+    // Skip "Bad Luck" sectors
+    if (sector.label === "Bad Luck") {
+      return sector;
+    }
+
+    // Check if this item is out of stock
+    if (inventory[sector.label] >= maxInventory[sector.label]) {
+      return {
+        ...sector,
+        label: "Bad Luck",
+        // color: "#f1131e", // Use the red color for Bad Luck
+        image:
+          "https://res.cloudinary.com/dicewvvjl/image/upload/v1736947162/pu0tlogr54tnhtjvsev7.png", // Use the Bad Luck image
+      };
+    }
+    return sector;
+  });
+
+  // Redraw the wheel with updated sectors
+  ctx.clearRect(0, 0, dia, dia);
+  sectors.forEach(drawSector);
+  rotate();
+}
+
+function initializeInventory() {
+  // Always set to the specified values, regardless of what's in localStorage
+  localStorage.setItem(
+    "wheelInventory",
+    JSON.stringify({
+      Perfume: 8,
+      "Water Bottle": 5,
+      "500/= Gift Voucher": 4,
+      "Soft Toy": 5,
+      "Vaccum Flask": 5,
+      "5000/= Gift Voucher": 0, // Initialize with 0 count
+    })
+  );
+  updateWheelSectors();
+}
+
+// Update the spinWithProbability function to include the 5000/= Gift Voucher
 function spinWithProbability() {
   // Don't do anything if wheel is already spinning
   console.log("click weighted probabilities");
@@ -1128,19 +1182,18 @@ function spinWithProbability() {
     "500/= Gift Voucher": 25,
     "Soft Toy": 24,
     "Vaccum Flask": 6,
-    // "5000/= Gift Voucher": 5,
+    "5000/= Gift Voucher": 5, // Keep this included but we'll avoid landing on it
   };
 
-  // The rest of the function remains the same
-  // Define base probabilities for each sector type
+  // Define base probabilities for each sector type with 0 probability for 5000/= Gift Voucher
   let probabilities = {
-    "Bad Luck": 0.35, // Increased from 0.25 to 0.35
-    Perfume: 0.28, // Slightly increased from 0.25 to 0.28
-    "Water Bottle": 0.22, // Slightly increased from 0.20 to 0.22
-    "500/= Gift Voucher": 0.08, // Reduced from 0.15 to 0.08
-    "Soft Toy": 0.05, // Reduced from 0.10 to 0.05
-    "Vaccum Flask": 0.01, // Reduced from 0.03 to 0.01
-    // "5000/= Gift Voucher": 0, // Reduced from 0.02 to 0.01
+    "Bad Luck": 0.35,
+    Perfume: 0.29, // Redistributed the 5000/= Gift Voucher probability
+    "Water Bottle": 0.23,
+    "500/= Gift Voucher": 0.08,
+    "Soft Toy": 0.05,
+    "Vaccum Flask": 0.0, // Set to 0 initially
+    "5000/= Gift Voucher": 0.0, // Force this to always be 0
   };
 
   // Calculate event progress as a percentage (0 to 1)
@@ -1155,7 +1208,7 @@ function spinWithProbability() {
   let inventoryRatios = {};
 
   for (const [item, maxCount] of Object.entries(maxInventory)) {
-    if (item === "Bad Luck" || item === "5000/= Gift Voucher") continue;
+    if (item === "Bad Luck" || item === "5000/= Gift Voucher") continue; // Skip these items
 
     const remaining = maxCount - (inventory[item] || 0);
     if (remaining > 0) {
@@ -1174,12 +1227,15 @@ function spinWithProbability() {
       let totalAdjustment = 0;
 
       for (const [item, ratio] of Object.entries(inventoryRatios)) {
-        if (ratio > 0) {
+        if (ratio > 0 && item !== "5000/= Gift Voucher") {
+          // Skip the 5000 voucher
           const inventoryWeight = ratio / totalInventoryRemaining;
           adjustedProbs[item] =
             probabilities[item] * (1 - urgencyFactor) +
             inventoryWeight * urgencyFactor;
           totalAdjustment += adjustedProbs[item];
+        } else if (item === "5000/= Gift Voucher") {
+          adjustedProbs[item] = 0; // Force this to always be 0
         } else {
           adjustedProbs[item] = 0;
         }
@@ -1190,13 +1246,16 @@ function spinWithProbability() {
       } else {
         let sum = 0;
         for (const item in adjustedProbs) {
-          if (item !== "Bad Luck") sum += adjustedProbs[item];
+          if (item !== "Bad Luck" && item !== "5000/= Gift Voucher")
+            sum += adjustedProbs[item];
         }
 
         for (const item in adjustedProbs) {
-          if (item !== "Bad Luck") adjustedProbs[item] /= sum;
+          if (item !== "Bad Luck" && item !== "5000/= Gift Voucher")
+            adjustedProbs[item] /= sum;
         }
         adjustedProbs["Bad Luck"] = 0;
+        adjustedProbs["5000/= Gift Voucher"] = 0; // Always force this to be 0
       }
 
       probabilities = adjustedProbs;
@@ -1211,7 +1270,7 @@ function spinWithProbability() {
       if (item === "Bad Luck") {
         probabilities[item] = 0.05;
       } else if (item === "5000/= Gift Voucher") {
-        continue;
+        probabilities[item] = 0; // Always force this to be 0
       } else {
         const remaining = maxInventory[item] - (inventory[item] || 0);
         probabilities[item] =
@@ -1222,25 +1281,34 @@ function spinWithProbability() {
 
   // Check inventory limits and set probability to 0 for items at max
   for (const [item, maxCount] of Object.entries(maxInventory)) {
-    if (inventory[item] >= maxCount) {
+    if (inventory[item] >= maxCount || item === "5000/= Gift Voucher") {
       probabilities[item] = 0;
     }
   }
 
-  // If all inventories are full, only allow "Bad Luck"
+  // Always ensure 5000/= Gift Voucher has 0 probability
+  probabilities["5000/= Gift Voucher"] = 0;
+
+  // If all inventories are full (except 5000 voucher), only allow "Bad Luck"
   const allFull = Object.entries(maxInventory).every(
-    ([item, max]) => inventory[item] >= max
+    ([item, max]) => item === "5000/= Gift Voucher" || inventory[item] >= max
   );
 
   if (allFull) {
-    probabilities = { "Bad Luck": 1 };
+    probabilities = { "Bad Luck": 1, "5000/= Gift Voucher": 0 };
   } else {
     // Normalize probabilities to ensure they sum to 1
     const totalProb = Object.values(probabilities).reduce((a, b) => a + b, 0);
     for (const item in probabilities) {
-      probabilities[item] /= totalProb;
+      if (item !== "5000/= Gift Voucher") {
+        // Skip the 5000 voucher when normalizing
+        probabilities[item] /= totalProb;
+      }
     }
   }
+
+  // Final safety check to ensure 5000/= Gift Voucher has 0 probability
+  probabilities["5000/= Gift Voucher"] = 0;
 
   // Log current probabilities for debugging
   console.log("Current probabilities:", probabilities);
@@ -1255,6 +1323,8 @@ function spinWithProbability() {
   let selectedPrizeType = null;
 
   for (const [prizeType, probability] of Object.entries(probabilities)) {
+    if (prizeType === "5000/= Gift Voucher") continue; // Skip this prize type
+
     cumulativeProbability += probability;
     if (randomValue <= cumulativeProbability) {
       selectedPrizeType = prizeType;
@@ -1262,10 +1332,21 @@ function spinWithProbability() {
     }
   }
 
+  // If somehow we didn't select a prize type, default to Bad Luck
+  if (!selectedPrizeType) {
+    selectedPrizeType = "Bad Luck";
+  }
+
   // Find all sectors that match the selected prize type
   const matchingSectors = sectors
     .map((sector, index) => ({ index, label: sector.label }))
-    .filter((sector) => sector.label === selectedPrizeType);
+    .filter((sector) => {
+      // Filter out 5000/= Gift Voucher explicitly
+      return (
+        sector.label === selectedPrizeType &&
+        sector.label !== "5000/= Gift Voucher"
+      );
+    });
 
   // If selected type is Bad Luck or no matching sectors, find all Bad Luck sectors
   if (selectedPrizeType === "Bad Luck" || matchingSectors.length === 0) {
@@ -1298,59 +1379,21 @@ function spinWithProbability() {
   spinToSector(selectedSector.index, 30);
 }
 
-// Also update the probability info display in the wheel controller
-function updateWheelController() {
-  const controller = document.getElementById("wheel-controller");
-  if (!controller) return;
+function forceSpinWithout5000Voucher() {
+  // First, identify all sectors that aren't 5000/= Gift Voucher
+  const availableSectors = sectors
+    .map((sector, index) => ({ index, label: sector.label }))
+    .filter((sector) => sector.label !== "5000/= Gift Voucher");
 
-  // Add a new section for probability settings
-  const probabilityInfo = document.createElement("div");
-  probabilityInfo.style.marginTop = "15px";
-  probabilityInfo.style.marginBottom = "15px";
-  probabilityInfo.style.padding = "10px";
-  probabilityInfo.style.backgroundColor = "#f5f5f5";
-  probabilityInfo.style.borderRadius = "5px";
-  probabilityInfo.style.border = "1px solid #ddd";
+  // Choose a sector randomly from the available ones
+  const randomIndex = Math.floor(Math.random() * availableSectors.length);
+  const selectedSector = availableSectors[randomIndex];
 
-  probabilityInfo.innerHTML = `
-  <div style="font-weight: bold; margin-bottom: 5px;">Prize Probabilities:</div>
-  <div>Bad Luck: 25%</div>
-  <div>Perfume: 25% (40 available)</div>
-  <div>Water Bottle: 20% (35 available)</div>
-  <div>500/= Gift Voucher: 15% (25 available)</div>
-  <div>Soft Toy: 10% (24 available)</div>
-  <div>Vaccum Flask: 3% (6 available)</div>
-  <div>5000/= Gift Voucher: 2% (25 available)</div>
-  <div style="margin-top: 8px; font-style: italic; font-size: 12px;">
-    Note: Rare items (Vaccum Flask & 5000/= Gift Voucher) become more likely
-    as the 5-hour timer progresses
-  </div>
-`;
-
-  // Replace existing probability info if it exists
-  const existingProbInfo = controller.querySelector(
-    'div[style*="Prize Probabilities"]'
-  )?.parentNode;
-  if (existingProbInfo) {
-    controller.replaceChild(probabilityInfo, existingProbInfo);
-  } else {
-    controller.insertBefore(
-      probabilityInfo,
-      controller.querySelector("#wheel-debug")
-    );
-  }
-
-  // Update event info to reflect 5-hour duration
-  const eventInfo = controller.querySelector(
-    'div[style*="5-Minute Event"]'
-  )?.parentNode;
-  if (eventInfo) {
-    eventInfo.innerHTML = `
-      <div style="font-weight: bold; margin-bottom: 5px;">5-Hour Event:</div>
-      <div>Start the event timer to begin spinning</div>
-      <div>Prizes are distributed throughout the event</div>
-    `;
-  }
+  // Spin to that sector
+  console.log(
+    `Forcing spin to avoid 5000/= Gift Voucher. Selected: ${selectedSector.label}`
+  );
+  spinToSector(selectedSector.index, 30);
 }
 
 // Also update the probability info display in the wheel controller
@@ -1369,23 +1412,23 @@ function updateWheelController() {
 
   probabilityInfo.innerHTML = `
   <div style="font-weight: bold; margin-bottom: 5px;">Prize Probabilities:</div>
-  <div>Bad Luck: 25%</div>
-  <div>Perfume: 20% (40 available)</div>
-  <div>Water Bottle: 20% (40 available)</div>
-  <div>500/= Gift Voucher: 15% (20 available)</div>
-  <div>Soft Toy: 10% (10 available)</div>
-  <div>Vaccum Flask: 5% (5 available)</div>
-  <div>5000/= Gift Voucher: 5% (5 available)</div>
+  <div>Bad Luck: 35%</div>
+  <div>Perfume: 28% (40 available)</div>
+  <div>Water Bottle: 22% (35 available)</div>
+  <div>500/= Gift Voucher: 8% (25 available)</div>
+  <div>Soft Toy: 5% (24 available)</div>
+  <div>Vaccum Flask: 1% (6 available)</div>
+  <div>5000/= Gift Voucher: 1% (5 available)</div>
   <div style="margin-top: 8px; font-style: italic; font-size: 12px;">
     Note: Rare items (Vaccum Flask & 5000/= Gift Voucher) become more likely
-    as the 5-minute timer progresses
+    as the timer progresses
   </div>
 `;
 
   // Replace existing probability info if it exists
   const existingProbInfo = controller.querySelector(
     'div[style*="Prize Probabilities"]'
-  ).parentNode;
+  )?.parentNode;
   if (existingProbInfo) {
     controller.replaceChild(probabilityInfo, existingProbInfo);
   } else {
@@ -1393,6 +1436,18 @@ function updateWheelController() {
       probabilityInfo,
       controller.querySelector("#wheel-debug")
     );
+  }
+
+  // Update event info to reflect current duration
+  const eventInfo = controller.querySelector(
+    'div[style*="5-Minute Event"]'
+  )?.parentNode;
+  if (eventInfo) {
+    eventInfo.innerHTML = `
+      <div style="font-weight: bold; margin-bottom: 5px;">Event Timer:</div>
+      <div>Start the event timer to begin spinning</div>
+      <div>Prizes are distributed throughout the event</div>
+    `;
   }
 }
 // Update spin button click handler
@@ -1599,3 +1654,22 @@ document.addEventListener(
   },
   { passive: false }
 );
+
+
+function updateClickHandler() {
+  bodyEl.onclick = function() {
+    if (!angVel) {
+      // Original: angVel = rand(0.6, 0.8);
+      // spinWithProbability();
+      forceSpinWithout5000Voucher(); // Use our direct approach
+      spinButtonClicked = true;
+    }
+  };
+}
+
+// Call this function once the document is loaded
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", updateClickHandler);
+} else {
+  updateClickHandler();
+}
