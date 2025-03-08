@@ -221,7 +221,14 @@ function updateInventoryDisplay() {
       <button id="reset-inventory" class="reset-button">Reset Inventory</button>
     </div>
   `;
+
+  // Add the event listener directly after creating the button
+  document
+    .getElementById("reset-inventory")
+    .addEventListener("click", resetInventory);
 }
+
+// Reset inventory function
 function resetInventory() {
   const confirmReset = confirm(
     "Are you sure you want to reset your inventory? This action cannot be undone."
@@ -234,9 +241,31 @@ function resetInventory() {
         Perfume: 0,
         "Water Bottle": 0,
         "500/= Gift Voucher": 0,
-        "Soft Toy": 0,
+        "Soft Toy": 8, // Keep at 8 to show full capacity
         "Vaccum Flask": 0,
-        "5000/= Gift Voucher": 0, // Make sure to include this in the reset
+        "5000/= Gift Voucher": 0,
+      })
+    );
+    updateInventoryDisplay();
+    updateWheelSectors();
+  }
+}
+// Also update the reset inventory function
+function resetInventory() {
+  const confirmReset = confirm(
+    "Are you sure you want to reset your inventory? This action cannot be undone."
+  );
+
+  if (confirmReset) {
+    localStorage.setItem(
+      "wheelInventory",
+      JSON.stringify({
+        Perfume: 0,
+        "Water Bottle": 0,
+        "500/= Gift Voucher": 0,
+        "Soft Toy": 8, // Keep at 8 to show full capacity
+        "Vaccum Flask": 0,
+        "5000/= Gift Voucher": 0,
       })
     );
     updateInventoryDisplay();
@@ -1237,21 +1266,21 @@ function updatePremiumHistory() {
 
 // Function to check inventory and update sectors
 
-// function initializeInventory() {
-//   // Always set to the specified values, regardless of what's in localStorage
-//   localStorage.setItem(
-//     "wheelInventory",
-//     JSON.stringify({
-//       Perfume: 0,
-//       "Water Bottle": 0,
-//       "500/= Gift Voucher": 0,
-//       "Soft Toy": 0,
-//       "Vaccum Flask": 0,
-//       "5000/= Gift Voucher": 0, // Initialize with 0 count
-//     })
-//   );
-//   updateWheelSectors();
-// }
+function initializeInventory() {
+  // Always set to the specified values, regardless of what's in localStorage
+  localStorage.setItem(
+    "wheelInventory",
+    JSON.stringify({
+      Perfume: 0,
+      "Water Bottle": 0,
+      "500/= Gift Voucher": 0,
+      "Soft Toy": 8,
+      "Vaccum Flask": 0,
+      "5000/= Gift Voucher": 0, // Initialize with 0 count
+    })
+  );
+  updateWheelSectors();
+}
 
 // Update the spinWithProbability function to include the 5000/= Gift Voucher
 function spinWithProbability() {
