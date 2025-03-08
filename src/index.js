@@ -28,9 +28,9 @@ const originalSectors = [
       "https://res.cloudinary.com/dicewvvjl/image/upload/v1741278001/perfume_efz3lf.png",
   },
   {
-    color: "#f1131e",
+    color: "#fff",
     text: "#333333",
-    label: "Try Again",
+    label: "Bad Luck",
     image:
       "https://res.cloudinary.com/dicewvvjl/image/upload/v1736947162/pu0tlogr54tnhtjvsev7.png",
   },
@@ -42,7 +42,7 @@ const originalSectors = [
       "https://res.cloudinary.com/dicewvvjl/image/upload/v1741279050/Gift2_dmrwa0.jpg",
   },
   {
-    color: "#f1131e",
+    color: "#fff",
     text: "#333333",
     label: "Soft Toy",
     image:
@@ -56,7 +56,7 @@ const originalSectors = [
       "https://res.cloudinary.com/dicewvvjl/image/upload/v1741277939/vaccum-flask_jk5ndj.png",
   },
   {
-    color: "#f1131e",
+    color: "#fff",
     text: "#333333",
     label: "5000/= Gift Voucher",
     image:
@@ -65,13 +65,13 @@ const originalSectors = [
   {
     color: "#ffda85",
     text: "#333333",
-    label: "Try Again",
+    label: "Bad Luck",
     image:
       "https://res.cloudinary.com/dicewvvjl/image/upload/v1736947162/pu0tlogr54tnhtjvsev7.png",
   },
 
   {
-    color: "#f1131e",
+    color: "#fff",
     text: "#333333",
     label: "Water Bottle",
     image:
@@ -122,8 +122,8 @@ function updateWheelSectors() {
   };
 
   sectors = originalSectors.map((sector) => {
-    // Skip "Try Again" sectors
-    if (sector.label === "Try Again") {
+    // Skip "Bad Luck" sectors
+    if (sector.label === "Bad Luck") {
       return sector;
     }
 
@@ -131,10 +131,10 @@ function updateWheelSectors() {
     if (inventory[sector.label] >= maxInventory[sector.label]) {
       return {
         ...sector,
-        label: "Try Again",
-        // color: "#f1131e", // Use the red color for Try Again
+        label: "Bad Luck",
+        // color: "#f1131e", // Use the red color for Bad Luck
         image:
-          "https://res.cloudinary.com/dicewvvjl/image/upload/v1736947162/pu0tlogr54tnhtjvsev7.png", // Use the Try Again image
+          "https://res.cloudinary.com/dicewvvjl/image/upload/v1736947162/pu0tlogr54tnhtjvsev7.png", // Use the Bad Luck image
       };
     }
     return sector;
@@ -167,8 +167,8 @@ function initializeInventory() {
 function updateInventory(item) {
   const inventory = JSON.parse(localStorage.getItem("wheelInventory"));
 
-  // Don't update inventory for "Try Again"
-  if (item === "Try Again") return;
+  // Don't update inventory for "Bad Luck"
+  if (item === "Bad Luck") return;
 
   inventory[item] = (inventory[item] || 0) + 1;
 
@@ -238,7 +238,7 @@ function resetInventory() {
 const rand = (m, M) => Math.random() * (M - m) + m;
 const tot = sectors.length;
 const spinEl = document.querySelector("#spin");
-const bodyEl = document.querySelector("#logo");
+const bodyEl = document.querySelector("#game");
 const resultsWrapperEl = document.querySelector("#results-wrapper");
 const resultEl = document.querySelector("#result");
 const resultTextEl = document.querySelector("#result-text");
@@ -281,7 +281,7 @@ function drawSector(sector, i) {
   ctx.translate(rad, rad);
   ctx.rotate(ang + arc / 2);
 
-  if (sector.label !== "Try Again" && sector.image) {
+  if (sector.label !== "Bad Luck" && sector.image) {
     // Draw image with preserved aspect ratio
     const maxImgSize = 150; // Maximum size for images
     const imgX = rad - maxImgSize - 30; // Position from edge
@@ -313,7 +313,7 @@ function drawSector(sector, i) {
       ctx.drawImage(img, imgX, adjustedImgY, imgWidth, imgHeight);
     }
   } else {
-    // Draw "Try Again" text
+    // Draw "Bad Luck" text
     ctx.textAlign = "right";
     ctx.fillStyle = sector.text;
     ctx.font = "bold 30px 'Lato', sans-serif";
@@ -369,12 +369,15 @@ updateInventoryDisplay();
 
 events.addListener("spinEnd", (sector) => {
   resultsWrapperEl.style.display = "flex";
-  resultEl.textContent = sector.label;
 
-  if (sector.label === "Try Again") {
-    resultTextEl.textContent = "Bad Luck!";
+  // Change "Bad Luck" to "Bad Luck" in the result text
+  if (sector.label === "Bad Luck") {
+    resultEl.textContent = "Bad Luck";
+    // Don't show the "Bad Luck!" text
+    resultTextEl.textContent = "";
     congratsTextEl.style.display = "none";
   } else {
+    resultEl.textContent = sector.label;
     resultTextEl.textContent = "You have won a";
     congratsTextEl.style.display = "block";
     updateInventory(sector.label);
@@ -773,7 +776,7 @@ let premiumItemWins = [];
 let eventStartTime = null;
 let eventTimer = null;
 let timerDisplay = null;
-let eventDurationSeconds = 5 * 60 * 60; // 5 hours in seconds
+let eventDurationSeconds = 12 * 60 * 60; // 12 hours in seconds
 let remainingSeconds = eventDurationSeconds;
 let isEventActive = false;
 
@@ -892,7 +895,7 @@ function createTimerDisplay() {
   // Start button
   const startButton = document.createElement("button");
   startButton.id = "start-timer";
-  startButton.textContent = "Start Event (5 hours)";
+  startButton.textContent = "Start Event (12   hours)";
   startButton.style.cssText = `
     padding: 8px 16px;
     background-color: white;
@@ -959,7 +962,7 @@ function startEvent() {
   // Update display
   document.getElementById("timer-text").textContent =
     formatTime(remainingSeconds);
-  document.getElementById("premium-counter").textContent = "Premium Wins: 0/10";
+  document.getElementById("premium-counter").textContent = "Premium Wins: 0/12";
 
   // Replace start button with reset button
   const startButton = document.getElementById("start-timer");
@@ -1008,7 +1011,7 @@ function resetEvent() {
   // Update display
   document.getElementById("timer-text").textContent =
     formatTime(remainingSeconds);
-  document.getElementById("premium-counter").textContent = "Premium Wins: 0/10";
+  document.getElementById("premium-counter").textContent = "Premium Wins: 0/12";
 
   // Create premium history section
   createPremiumHistorySection();
@@ -1132,7 +1135,7 @@ function spinWithProbability() {
   // The rest of the function remains the same
   // Define base probabilities for each sector type
   let probabilities = {
-    "Try Again": 0.25,
+    "Bad Luck": 0.25,
     Perfume: 0.25,
     "Water Bottle": 0.2,
     "500/= Gift Voucher": 0.15,
@@ -1153,7 +1156,7 @@ function spinWithProbability() {
   let inventoryRatios = {};
 
   for (const [item, maxCount] of Object.entries(maxInventory)) {
-    if (item === "Try Again") continue;
+    if (item === "Bad Luck") continue;
 
     const remaining = maxCount - (inventory[item] || 0);
     if (remaining > 0) {
@@ -1184,17 +1187,17 @@ function spinWithProbability() {
       }
 
       if (totalAdjustment < 1) {
-        adjustedProbs["Try Again"] = 1 - totalAdjustment;
+        adjustedProbs["Bad Luck"] = 1 - totalAdjustment;
       } else {
         let sum = 0;
         for (const item in adjustedProbs) {
-          if (item !== "Try Again") sum += adjustedProbs[item];
+          if (item !== "Bad Luck") sum += adjustedProbs[item];
         }
 
         for (const item in adjustedProbs) {
-          if (item !== "Try Again") adjustedProbs[item] /= sum;
+          if (item !== "Bad Luck") adjustedProbs[item] /= sum;
         }
-        adjustedProbs["Try Again"] = 0;
+        adjustedProbs["Bad Luck"] = 0;
       }
 
       probabilities = adjustedProbs;
@@ -1206,7 +1209,7 @@ function spinWithProbability() {
     console.log("FINAL 30 SECONDS - CLEARING INVENTORY");
 
     for (const item in probabilities) {
-      if (item === "Try Again") {
+      if (item === "Bad Luck") {
         probabilities[item] = 0.05;
       } else {
         const remaining = maxInventory[item] - (inventory[item] || 0);
@@ -1223,13 +1226,13 @@ function spinWithProbability() {
     }
   }
 
-  // If all inventories are full, only allow "Try Again"
+  // If all inventories are full, only allow "Bad Luck"
   const allFull = Object.entries(maxInventory).every(
     ([item, max]) => inventory[item] >= max
   );
 
   if (allFull) {
-    probabilities = { "Try Again": 1 };
+    probabilities = { "Bad Luck": 1 };
   } else {
     // Normalize probabilities to ensure they sum to 1
     const totalProb = Object.values(probabilities).reduce((a, b) => a + b, 0);
@@ -1263,18 +1266,18 @@ function spinWithProbability() {
     .map((sector, index) => ({ index, label: sector.label }))
     .filter((sector) => sector.label === selectedPrizeType);
 
-  // If selected type is Try Again or no matching sectors, find all Try Again sectors
-  if (selectedPrizeType === "Try Again" || matchingSectors.length === 0) {
+  // If selected type is Bad Luck or no matching sectors, find all Bad Luck sectors
+  if (selectedPrizeType === "Bad Luck" || matchingSectors.length === 0) {
     const tryAgainSectors = sectors
       .map((sector, index) => ({ index, label: sector.label }))
-      .filter((sector) => sector.label === "Try Again");
+      .filter((sector) => sector.label === "Bad Luck");
 
-    // Make sure we found the Try Again sectors
+    // Make sure we found the Bad Luck sectors
     if (tryAgainSectors.length > 0) {
       const randomIndex = Math.floor(Math.random() * tryAgainSectors.length);
       spinToSector(tryAgainSectors[randomIndex].index, 30);
       console.log(
-        `Spinning to Try Again sector ${tryAgainSectors[randomIndex].index}`
+        `Spinning to Bad Luck sector ${tryAgainSectors[randomIndex].index}`
       );
       return;
     }
@@ -1310,7 +1313,7 @@ function updateWheelController() {
 
   probabilityInfo.innerHTML = `
   <div style="font-weight: bold; margin-bottom: 5px;">Prize Probabilities:</div>
-  <div>Try Again: 25%</div>
+  <div>Bad Luck: 25%</div>
   <div>Perfume: 25% (40 available)</div>
   <div>Water Bottle: 20% (35 available)</div>
   <div>500/= Gift Voucher: 15% (25 available)</div>
@@ -1365,7 +1368,7 @@ function updateWheelController() {
 
   probabilityInfo.innerHTML = `
   <div style="font-weight: bold; margin-bottom: 5px;">Prize Probabilities:</div>
-  <div>Try Again: 25%</div>
+  <div>Bad Luck: 25%</div>
   <div>Perfume: 20% (40 available)</div>
   <div>Water Bottle: 20% (40 available)</div>
   <div>500/= Gift Voucher: 15% (20 available)</div>
@@ -1500,7 +1503,7 @@ function trackPremiumWin(item) {
   // Update counter
   const premiumCounter = document.getElementById("premium-counter");
   if (premiumCounter) {
-    premiumCounter.textContent = `Premium Wins: ${premiumItemWins.length}/10`;
+    premiumCounter.textContent = `Premium Wins: ${premiumItemWins.length}/12`;
   }
 
   // Update history display
